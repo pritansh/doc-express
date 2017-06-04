@@ -1,0 +1,12 @@
+{
+  "name": "doc-express",
+  "version": "0.0.1",
+  "description": "Host a documentation server for an express based API",
+  "main": "index.js",
+  "author": "Pritansh Chaudhary",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.3",
+    "extract-comments": "^0.10.1"
+  }
+}
