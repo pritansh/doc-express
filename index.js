@@ -23,12 +23,6 @@ jsonDoc = (path, uri, port, dir, obj={}) => {
             routes: data
         }
     })
-    doc_path = `${dir_path}/doc`
-    try {
-        fs.statSync(`${doc_path}`)
-    } catch(error) {
-        fs.mkdirSync(`${doc_path}`)
-    }
     final_obj = {
         base_url: `http://${uri}/${port}`,
         models_directory: dir,
@@ -36,7 +30,19 @@ jsonDoc = (path, uri, port, dir, obj={}) => {
     }
     for(key in obj)
         final_obj[key] = obj[key]
-    fs.writeFileSync(`${doc_path}/doc.json`, JSON.stringify(final_obj))
+    fs.writeFileSync(`${__dirname}/doc/doc.json`, JSON.stringify(final_obj))
 }
 
-module.exports = jsonDoc
+hostDoc = () => {
+    bash = require('child_process').spawn('bash')
+    bash.stdout.pipe(process.stdout)
+    bash.stderr.pipe(process.stderr)
+    bash.on('exit', (code) => console.log(`Exited with code ${code}`))
+    bash.stdin.write(`cd ${__dirname} && node doc/main.js`)
+    bash.stdin.end()
+}
+
+module.exports = {
+    json: jsonDoc,
+    host: hostDoc
+}
