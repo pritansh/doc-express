@@ -18,23 +18,86 @@
 <link id="theme-style" rel="stylesheet" href="assets/css/styles.css">
 
 <script>
-    function load_model(model_name) {
-        console.log(model_name)
-    }
-    function removeChilds(element) {
+    function removeChilds(element, id) {
         while(element.firstChild)
             element.removeChild(element.firstChild)
+        btn = document.querySelector('a#' + id) 
+        if(btn)
+            btn.parentNode.removeChild(btn)
     }
     function update(element, str, type) {
-        element.appendChild(new DOMParser().parseFromString(str, type).children[0].children[1].children[0])
+        console.log(new DOMParser().parseFromString(str, type).children[0])
+        element.appendChild(new DOMParser().parseFromString(str, type).children[0].children[1])
+    }
+    function check(element) {
+        str = ''
+        if(element) {
+            str += '<td>'
+            keys = Object.keys(element)
+            for(j=0;j<keys.length;j++)
+                str += `<span class="label label-success">${keys[j]}: ${element[keys[j]]}</span>&nbsp;`
+            str += '</td>'
+        }
+        return str
+    }
+    function api_call(obj) {
+        obj = JSON.parse(decodeURIComponent(obj))
+        console.log(obj)
+    }
+    function load_model(model_name) {
+        xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange = function() {
+            if(this.readyState == 4 && this.status == 200) {
+                node = document.querySelector('section.cards-section.text-center').children[0].children[0]
+                parent = node.parentNode.innerHTML
+                removeChilds(node, 'model')
+                routes = JSON.parse(this.responseText)['routes']
+                console.log(routes)
+                str = `<div class="table-responsive">
+                            <table class="table table">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Method</th>
+                                        <th>Url</th>
+                                        <th>Params/Body</th>
+                                        <th>Test</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`
+                for(i=0;i<routes.length;i++) {
+                    str += `<tr>
+                                <td>${routes[i].desc}</td>
+                                <td>${routes[i].method}</td>
+                                <td>${routes[i].url}</td>`
+                    str += check(routes[i].params, str)
+                    str += check(routes[i].body, str)
+                    str += `    <td><a class="btn btn-blue btn-cta" onclick="api_call('${encodeURIComponent(JSON.stringify(routes[i]))}')"><i class="fa fa-play-circle"></i>Test</a></td>
+                            </tr>`
+                }
+                str += `</tbody></table></div>`
+                update(node, str, 'text/html')
+                btn = document.createElement('a')
+                btn.classList.add('btn')
+                btn.classList.add('btn-primary')
+                btn.id = 'api'
+                btn.innerText = 'Models'
+                btn.onclick = function(event) {
+                    load_models()
+                }
+                node.parentNode.appendChild(btn)
+            }
+        }
+        xhttp.open('GET', 'http://localhost:9993/model/' + model_name, true)
+        xhttp.send()
     }
     function load_models() {
         xhttp = new XMLHttpRequest()
         xhttp.onreadystatechange = function() {
             if(this.readyState == 4 && this.status == 200) {
                 node = document.querySelector('section.cards-section.text-center').children[0].children[0]
-                children = node.innerHTML
-                removeChilds(node)
+                parent = node.parentNode.innerHTML
+                removeChilds(node, 'api')
                 console.log(JSON.parse(this.responseText))
                 models = JSON.parse(this.responseText)['models']
                 for(i=0;i<models.length;i++)
@@ -52,16 +115,18 @@
                 btn = document.createElement('a')
                 btn.classList.add('btn')
                 btn.classList.add('btn-primary')
-                btn.innerText = 'Go Back'
+                btn.id = 'model'
+                btn.innerText = 'Home'
                 btn.onclick = function(event) {
-                    removeChilds(node)
-                    node.parentNode.removeChild(btn)
-                    update(node, children, 'text/html')
+                    load_home()
                 }
                 node.parentNode.appendChild(btn)
             }
         }
         xhttp.open('GET', 'http://localhost:9993/json', true)
         xhttp.send()
+    }
+    function load_home() {
+        location.reload()
     }
 </script>

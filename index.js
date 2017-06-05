@@ -32,6 +32,7 @@ jsonDoc = (path, uri, port, dir, obj={}) => {
     for(key in obj)
         final_obj[key] = obj[key]
     fs.writeFileSync(`${__dirname}/doc/doc.json`, JSON.stringify(final_obj))
+    hostDoc()
 }
 
 hostDoc = () => {
@@ -44,6 +45,5 @@ hostDoc = () => {
 }
 
 module.exports = {
-    json: jsonDoc,
-    host: hostDoc
+    json: jsonDoc
 }

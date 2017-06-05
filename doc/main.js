@@ -16,4 +16,8 @@ app.get('/json', (request, response) => response.send(JSON.stringify({
     models: require('./doc.json')['models'].map((model_name) => model_name['model'])
 })))
 
+app.get('/model/:name', (request, response) => response.send(JSON.stringify({
+    routes: require('./doc.json')['models'].filter((model_name) => model_name['model'] == request.params.name)[0].routes
+})))
+
 app.listen(port, () => console.log(`Documentation Server running on port ${port}`))
