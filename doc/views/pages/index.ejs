@@ -1,9 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <% include ../common/head %>
-    </head>
-    <body>
-        <h1><%= doc.base_url %></h1>
-    </body>
+
+<head>
+    <% include ../common/head %>
+</head>
+
+<body class="landing-page">
+
+    <div class="page-wrapper">
+
+        <% include ../common/header %>
+
+            <section class="cards-section text-center">
+                <div class="container">
+                    <!--//intro-->
+                    <div id="cards-wrapper" class="cards-wrapper row">
+                        <div class="item item-green col-md-4 col-sm-6 col-xs-6">
+                            <div class="item-inner" onclick="load_models()">
+                                <div class="icon-holder">
+                                    <i class="icon fa fa-paper-plane"></i>
+                                </div>
+                                <!--//icon-holder-->
+                                <h3 class="title">Models</h3>
+                                <p class="intro">View all models for API</p>
+
+                            </div>
+                            <!--//item-inner-->
+                        </div>
+                    </div>
+                    <!--//cards-->
+
+                </div>
+                <!--//container-->
+            </section>
+            <!--//cards-section-->
+    </div>
+    <footer class="footer text-center">
+        <div class="container">
+            <!--/* This template is released under the Creative Commons Attribution 3.0 License. Please keep the attribution link below when using for your own project. Thank you for your support. :) If you'd like to use the template without the attribution, you can check out other license options via our website: themes.3rdwavemedia.com */-->
+            <small class="copyright"><%= api_name %></small>
+
+        </div>
+        <!--//container-->
+    </footer>
+    <!--//footer-->
+
+    <!-- Main Javascript -->
+    <script type="text/javascript" src="assets/plugins/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/plugins/jquery-match-height/jquery.matchHeight-min.js"></script>
+    <script type="text/javascript" src="assets/js/main.js"></script>
+</body>
+
 </html>

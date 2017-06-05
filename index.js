@@ -26,7 +26,8 @@ jsonDoc = (path, uri, port, dir, obj={}) => {
     final_obj = {
         base_url: `http://${uri}/${port}`,
         models_directory: dir,
-        models:files
+        models:files,
+        api_name: dir_path.slice(dir_path.lastIndexOf('/') + 1)
     }
     for(key in obj)
         final_obj[key] = obj[key]
