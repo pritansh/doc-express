@@ -13,6 +13,7 @@
 <!-- Plugins CSS -->
 <link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome.css">
 <link rel="stylesheet" href="assets/plugins/elegant_font/css/style.css">
+<link rel="stylesheet" href="assets/plugins/prism/prism.css">
 
 <!-- Theme CSS -->
 <link id="theme-style" rel="stylesheet" href="assets/css/styles.css">
@@ -26,8 +27,7 @@
             btn.parentNode.removeChild(btn)
     }
     function update(element, str, type) {
-        console.log(new DOMParser().parseFromString(str, type).children[0])
-        element.appendChild(new DOMParser().parseFromString(str, type).children[0].children[1])
+        element.appendChild(new DOMParser().parseFromString(str, type).children[0].children[1].children[0])
     }
     function check(element) {
         str = ''
@@ -40,9 +40,85 @@
         }
         return str
     }
+    function highlight(str) {
+        xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange = function() {
+            if(this.readyState == 4 && this.status == 200) {
+                node = document.querySelector('section.cards-section.text-center').children[0].children[0]
+                html = JSON.parse(this.responseText)['html']
+                html = html.replace(/\n/g, '<br/>')
+                html = html.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+                str = `<div><br/><br/>
+                        <div class="callout-block callout-success">
+                            <div class="icon-holder">
+                                <i class="fa fa-thumbs-up"></i>
+                            </div><!--//icon-holder-->
+                            <div class="content">
+                                <h4 class="callout-title">${html}</h4>
+                            </div><!--//content-->
+                        </div></div>`
+                update(node.parentNode, str, 'text/html')
+            }
+        }
+        xhttp.open('POST', 'http://localhost:9993/syntax', true)
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+        xhttp.send(`text=${str}`)
+    }
+    function test_api(data, request) {
+        data = JSON.parse(decodeURIComponent(data))
+        xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange = function() {
+            if(this.readyState == 4 && this.status == 200) {
+                highlight(this.responseText)
+            }
+        }
+        if(data.method == 'GET') {
+            xhttp.open('GET', 'http://localhost:9992/user', true)
+            xhttp.send()
+        }
+        else if(data.method == 'POST') {
+            request = request.replace(/\$/g, '\'').split('&')
+            for(m=0;m<request.length;m++) {
+                temp = request[m].split('=')
+                temp[1] = eval(temp[1]).value
+                request[m] = temp.join('=')
+            }
+            request = request.join('&')
+            xhttp.open('POST', 'http://localhost:9992/user', true)
+            xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+            xhttp.send(request)
+        }
+    }
     function api_call(obj) {
         obj = JSON.parse(decodeURIComponent(obj))
-        console.log(obj)
+        data = {}
+        data['method'] = obj.method
+        data['url'] = obj.url
+        if(obj.params)
+            data['params'] = obj.params
+        if(obj.body)
+            data['body'] = obj.body
+        node = document.querySelector('section.cards-section.text-center').children[0].children[0]
+        parent = node.parentNode.innerHTML
+        removeChilds(node, 'api')
+        html = `<div><h2 class="title">${obj.desc}</h2>`
+        request = ''
+        if(obj.method == 'GET')
+            if(obj.params)
+                html += `<p><code><i class="fa fa-exclamation-circle">&nbsp;&nbsp;</i>Params</code></p>`
+        if(obj.method == 'POST')
+            if(obj.body) {
+                html += `<code><i class="fa fa-exclamation-circle">&nbsp;&nbsp;</i>Body</code><br/>`
+                keys = Object.keys(obj.body)
+                for(k=0;k<keys.length;k++) {
+                    if(k > 0)
+                        request += '&'
+                    html += `<br/><div class="input-group input-group-sm" style="margin: 0 auto;width:30%"><span class="input-group-addon">${keys[k]}</span><input id="${keys[k]}" type="text" class="form-control" style="width:20vw;"/></div>`
+                    request += `${keys[k]}=document.getElementById($${keys[k]}$)`
+                }
+            }
+        html += `<br/><br/><a class="btn btn-green" onclick="test_api('${encodeURIComponent(JSON.stringify(data))}', '${request}')"><i class="fa fa-download"></i>Test</a></div>`
+        update(node.parentNode, html, 'text/html')
     }
     function load_model(model_name) {
         xhttp = new XMLHttpRequest()
