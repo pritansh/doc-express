@@ -40,6 +40,12 @@
         }
         return str
     }
+    function update_routes(model_name) {
+        route_node = document.getElementById('routes')
+        if(route_node)
+            route_node.parentNode.removeChild(route_node)
+        load_model(model_name)
+    }
     function highlight(str) {
         xhttp = new XMLHttpRequest()
         xhttp.onreadystatechange = function() {
@@ -48,7 +54,7 @@
                 html = JSON.parse(this.responseText)['html']
                 html = html.replace(/\n/g, '<br/>')
                 html = html.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
-                str = `<div><br/><br/>
+                str = `<div id="response"><br/><br/>
                         <div class="callout-block callout-success">
                             <div class="icon-holder">
                                 <i class="fa fa-thumbs-up"></i>
@@ -69,6 +75,9 @@
         xhttp = new XMLHttpRequest()
         xhttp.onreadystatechange = function() {
             if(this.readyState == 4 && this.status == 200) {
+                res = document.getElementById('response')
+                if(res)
+                    res.parentNode.removeChild(res)
                 highlight(this.responseText)
             }
         }
@@ -101,7 +110,7 @@
         node = document.querySelector('section.cards-section.text-center').children[0].children[0]
         parent = node.parentNode.innerHTML
         removeChilds(node, 'api')
-        html = `<div><h2 class="title">${obj.desc}</h2>`
+        html = `<div id="routes"><h2 class="title">${obj.desc}</h2>`
         request = ''
         if(obj.method == 'GET')
             if(obj.params)
@@ -117,7 +126,7 @@
                     request += `${keys[k]}=document.getElementById($${keys[k]}$)`
                 }
             }
-        html += `<br/><br/><a class="btn btn-green" onclick="test_api('${encodeURIComponent(JSON.stringify(data))}', '${request}')"><i class="fa fa-download"></i>Test</a></div>`
+        html += `<br/><br/><a class="btn btn-green" onclick="test_api('${encodeURIComponent(JSON.stringify(data))}', '${request}')"><i class="fa fa-download"></i>Test</a>&nbsp;<a class="btn btn-primary" onclick="update_routes('${obj.model_name}')">Routes</a></div>`
         update(node.parentNode, html, 'text/html')
     }
     function load_model(model_name) {
@@ -142,6 +151,7 @@
                                 </thead>
                                 <tbody>`
                 for(i=0;i<routes.length;i++) {
+                    routes[i]['model_name'] = model_name
                     str += `<tr>
                                 <td>${routes[i].desc}</td>
                                 <td>${routes[i].method}</td>
